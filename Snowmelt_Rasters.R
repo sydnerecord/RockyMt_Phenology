@@ -6,7 +6,7 @@
 ##############################################################################################################
 
 # Specify root folder for inputs and outputs 
-root_folder <- 'G:/Shared drives/MSB_Phenology/RockyMt_Phenology'
+root_folder <- 'G:/Shared drives/MSB_Phenology/RockyMt'
 # Set your working directory to the root folder
 setwd(file.path(root_folder))
 # Define a file path for exporting from this script. 
@@ -80,7 +80,22 @@ snowmelt19_25_stack_Rm <- subst(snowmelt19_25_stack_RM, 0, NA)
 # stack together all years 2001-2025
 snowmelt01_25_RM <- c(snowmelt01_18_stack_Rm, snowmelt19_25_stack_Rm)
 
+# Add names to last six layers 
+names(snowmelt01_25_RM)[19:25] <- c("Snowmelt_North_America_2019", "Snowmelt_North_America_2020", "Snowmelt_North_America_2021", "Snowmelt_North_America_2022", "Snowmelt_North_America_2023", "Snowmelt_North_America_2024", "Snowmelt_North_America_2025")
+
 # export raster stack
-writeRaster(snowmelt01_25_RM, filename="output_data/snowmelt01_25.tif", overwrite=TRUE)
+writeRaster(snowmelt01_25_RM, filename="output_data/snowmelt01_25_updated.tif", overwrite=TRUE)
+
+
+
+############## Read raster stack back in and extract herbarium points
+# Read back in snowmelt01_25_RM raster stack
+snowmelt <- rast('output_data/snowmelt01_25.tif')
+
+# Extract data for each year from raster stack of snowmelt values for herbarium point locations
+herbvalues <- terra::extract(snowmelt, sf_points, xy=TRUE)
+
+# Write herbarium point values for snowmelt by year to .csv
+write.csv(herbvalues, "output_data/herbvalues_snowmelt.csv")
 
 
